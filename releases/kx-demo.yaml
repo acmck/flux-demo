@@ -1,0 +1,43 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: kx-deploy
+  namespace: demo
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: kx
+  chart:
+    repository: http://charts.ci.svc:8080
+    name: kx
+    version: 0.1.3
+  values:
+    global:
+      image:
+        repository: gcr.io/cloudpak/
+      license:
+        user: "Andrew McKinney"
+        email: "amckinneyk@qarik.com"
+      persistence:
+        enabled: true
+        storageClass: nfs-client
+        shared:
+          enabled: true
+          storageClass: nfs-client
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+    rdb:
+      resources:
+        requests:
+        cpu: 1000m
+      metrics:
+        resources:
+        requests:
+          cpu: 50m
+      autoscaling:
+        enabled: true
+        minReplicas: 1
+        maxReplicas: 5
+        targetCPUUtilizationPercentage: 80
